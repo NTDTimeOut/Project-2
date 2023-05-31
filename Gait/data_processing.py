@@ -7,7 +7,7 @@ id = list(data.ID)
 gender = list(data.Gender)
 size = len(id)
 
-max_data_length = 70 # Độ dài mong muốn cho mỗi tệp CSV
+max_data_length = 120 # Độ dài mong muốn cho mỗi tệp CSV
 
 def truncate_or_pad_data(data, length):
     if len(data) < length:
@@ -24,7 +24,7 @@ def truncate_or_pad_data(data, length):
 def data_processing (id,i):
     id = id
     try:
-        dataset_file = f'./Gait/Data_set/Data/T0_ID{id}_Walk1.csv' #[] this_i = 0
+        dataset_file = f'./Gait/Data_set/Data2/T0_ID{id}_Walk2.csv' #[] this_i = 0
         print(dataset_file)
         dataset_id = os.path.basename(dataset_file).split('_')[1]
         dataset = pd.read_csv(dataset_file, skiprows = 2, names=['Gx','Gy','Gz','Ax','Ay','Az'])
@@ -105,11 +105,11 @@ def data_processing (id,i):
     })
 
     # Đường dẫn thư mục tùy ý
-    folder_path = './Gait/Data_set/Data_processing'
+    folder_path = './Gait/Data_set/Data_test'
     if(gender[i]=='0'):
-        output_file = os.path.join(folder_path, dataset_id + '_Walk1_0.csv')
+        output_file = os.path.join(folder_path, dataset_id + '_Walk2_0.csv')
     else:
-        output_file = os.path.join(folder_path, dataset_id + '_Walk1_1.csv')
+        output_file = os.path.join(folder_path, dataset_id + '_Walk2_1.csv')
     # Xuất DataFrame vào file Excel
     print(output_file)
     try:
