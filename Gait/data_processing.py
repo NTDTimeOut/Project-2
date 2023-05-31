@@ -2,16 +2,29 @@ import pandas as pd
 import os
 import numpy as np
 
-data = pd.read_csv(r'D:\Ki2020_2\Project 2\Ff\Data_set\results\IDGenderAgelist.csv', dtype = str)
+data = pd.read_csv(r'D:\Project-2\Gait\Data_set\results\IDGenderAgelist.csv', dtype = str)
 id = list(data.ID)
 gender = list(data.Gender)
 size = len(id)
 
+max_data_length = 70 # Độ dài mong muốn cho mỗi tệp CSV
+
+def truncate_or_pad_data(data, length):
+    if len(data) < length:
+        # Đệm dữ liệu bằng số 0 ở cuối
+        padded_data = np.pad(data, (0, length - len(data)), mode='constant')
+        return padded_data
+    elif len(data) > length:
+        # Cắt bớt dữ liệu theo độ dài mong muốn
+        truncated_data = data[:length]
+        return truncated_data
+    else:
+        return data
 
 def data_processing (id,i):
     id = id
     try:
-        dataset_file = f'./Data_set/Data/T0_ID{id}_Walk1.csv' #[] this_i = 0
+        dataset_file = f'./Gait/Data_set/Data/T0_ID{id}_Walk1.csv' #[] this_i = 0
         print(dataset_file)
         dataset_id = os.path.basename(dataset_file).split('_')[1]
         dataset = pd.read_csv(dataset_file, skiprows = 2, names=['Gx','Gy','Gz','Ax','Ay','Az'])
@@ -74,19 +87,25 @@ def data_processing (id,i):
 
     t_plot2 = np.linspace(0, 50, filtered_Gx.size)
 
+# Cắt bớt hoặc đệm dữ liệu đã lọc theo độ dài mong muốn
+    filtered_Gx = truncate_or_pad_data(filtered_Gx, max_data_length)
+    filtered_Gy = truncate_or_pad_data(filtered_Gy, max_data_length)
+    filtered_Gz = truncate_or_pad_data(filtered_Gz, max_data_length)
+    filtered_Ax = truncate_or_pad_data(filtered_Ax, max_data_length)
+    filtered_Ay = truncate_or_pad_data(filtered_Ay, max_data_length)
+    filtered_Az = truncate_or_pad_data(filtered_Az, max_data_length)
+
     df = pd.DataFrame({
-    'Gx': filtered_Gx.astype(complex),
-    'Gy': filtered_Gy.astype(complex),
-    'Gz': filtered_Gz.astype(complex),
-    'Ax': filtered_Ax.astype(complex),
-    'Ay': filtered_Ay.astype(complex),
-    'Az': filtered_Az.astype(complex)
+        'Gx': np.abs(filtered_Gx.astype(complex)),
+        'Gy': np.abs(filtered_Gy.astype(complex)),
+        'Gz': np.abs(filtered_Gz.astype(complex)),
+        'Ax': np.abs(filtered_Ax.astype(complex)),
+        'Ay': np.abs(filtered_Ay.astype(complex)),
+        'Az': np.abs(filtered_Az.astype(complex))
     })
 
-    # Biến đổi số phức thành số thực
-    df = df.apply(np.real)
     # Đường dẫn thư mục tùy ý
-    folder_path = './Data_set/Data_processing/'
+    folder_path = './Gait/Data_set/Data_processing'
     if(gender[i]=='0'):
         output_file = os.path.join(folder_path, dataset_id + '_Walk1_0.csv')
     else:
