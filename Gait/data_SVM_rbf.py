@@ -244,7 +244,7 @@ def train_test():
         train_data.append(flattened_data)
         train_labels.append(label)
     # Xây dựng mô hình SVM
-    svm_model = SVC(kernel='poly')
+    svm_model = SVC(kernel='rbf')
     svm_model.fit(train_data, train_labels)
 
     test_path = "./Data_set/Data_test/"
