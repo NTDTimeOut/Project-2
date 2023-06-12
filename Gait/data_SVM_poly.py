@@ -292,4 +292,4 @@ for i in range(0,91) :
 df = pd.DataFrame({
     'predictions': np.abs(results)
 })
-df.to_csv('./results.csv', index=False)
+df.to_csv('./results_poly.csv', index=False)
