@@ -212,5 +212,5 @@ def data_processing_test (id,i, max_data_length):
     except FileExistsError: print('out error'); exit()
 
 for i in range(size):
-    data_processing_test (id[i],i,99)
-    data_processing_train(id[i],i,99)
+    data_processing_test (id[i],i,86)
+    data_processing_train(id[i],i,86)
