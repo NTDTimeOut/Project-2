@@ -1,11 +1,17 @@
-import pandas as pd
 import os
 import numpy as np
+import pandas as pd
+from sklearn import svm
+from sklearn.svm import SVC
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
-data = pd.read_csv(r'Data_set\results\IDGenderAgelist.csv', dtype = str)
+data = pd.read_csv(r'.\Data_set\results\IDGenderAgelist.csv', dtype = str)
 id = list(data.ID)
 gender = list(data.Gender)
 size = len(id)
+results = []
 
 # max_data_length = 100 # Độ dài mong muốn cho mỗi tệp CSV
 
@@ -24,7 +30,7 @@ def truncate_or_pad_data(data, length):
 def data_processing_train (id,i, max_data_length):
     id = id
     try:
-        dataset_file = f'./Data_set/Data/T0_ID{id}_Walk1.csv' #[] this_i = 0
+        dataset_file = f'../Data_set/Data/T0_ID{id}_Walk1.csv' #[] this_i = 0
         print(dataset_file)
         dataset_id = os.path.basename(dataset_file).split('_')[1]
         dataset = pd.read_csv(dataset_file, skiprows = 2, names=['Gx','Gy','Gz','Ax','Ay','Az'])
@@ -105,7 +111,7 @@ def data_processing_train (id,i, max_data_length):
     })
 
     # Đường dẫn thư mục tùy ý
-    folder_path = './Data_set/Data_train'
+    folder_path = '../Data_set/Data_train'
     if(gender[i]=='0'):
         output_file = os.path.join(folder_path, dataset_id + '_Walk1_0.csv')
     else:
@@ -119,7 +125,7 @@ def data_processing_train (id,i, max_data_length):
 def data_processing_test (id,i, max_data_length):
     id = id
     try:
-        dataset_file = f'./Data_set/Data2/T0_ID{id}_Walk2.csv' #[] this_i = 0
+        dataset_file = f'../Data_set/Data2/T0_ID{id}_Walk2.csv' #[] this_i = 0
         print(dataset_file)
         dataset_id = os.path.basename(dataset_file).split('_')[1]
         dataset = pd.read_csv(dataset_file, skiprows = 2, names=['Gx','Gy','Gz','Ax','Ay','Az'])
@@ -200,7 +206,7 @@ def data_processing_test (id,i, max_data_length):
     })
 
     # Đường dẫn thư mục tùy ý
-    folder_path = './Data_set/Data_test'
+    folder_path = '../Data_set/Data_test'
     if(gender[i]=='0'):
         output_file = os.path.join(folder_path, dataset_id + '_Walk2_0.csv')
     else:
@@ -211,6 +217,79 @@ def data_processing_test (id,i, max_data_length):
         df.to_csv(output_file, index=False)
     except FileExistsError: print('out error'); exit()
 
-for i in range(size):
-    data_processing_test (id[i],i,86)
-    data_processing_train(id[i],i,86)
+def train_test():
+    # Đường dẫn đến thư mục chứa dữ liệu
+    data_processing_dir = "../Data_set/Data_train/"
+
+
+    # Xác định các đặc trưng (features) và nhãn (labels)
+    features = ["Gx", "Gy", "Gz", "Ax", "Ay", "Az"]
+
+    # Chuẩn bị dữ liệu huấn luyện
+    train_data = []
+    train_labels = []
+
+    # Đọc dữ liệu từ thư mục Data_processing
+    for file_name in os.listdir(data_processing_dir):
+        if file_name.endswith("_0.csv"):
+            label = 0  # Nhãn nữ
+        elif file_name.endswith("_1.csv"):
+            label = 1  # Nhãn nam
+        else:
+            continue
+
+        file_path = os.path.join(data_processing_dir, file_name)
+        df = pd.read_csv(file_path)
+        flattened_data = df[features].values.flatten()  # Chuyển đổi dữ liệu thành 2 chiều
+        train_data.append(flattened_data)
+        train_labels.append(label)
+    # Xây dựng mô hình SVM
+    svm_model = SVC(kernel='linear')
+    svm_model.fit(train_data, train_labels)
+
+    test_path = "../Data_set/Data_test/"
+
+
+    test_data = []
+    test_filenames = []
+    test_labels = []
+
+    # Duyệt qua các tệp tin trong thư mục test_path
+    for filename in os.listdir(test_path):
+        # Kiểm tra nếu tệp tin có đuôi .csv
+        if filename.endswith(".csv"):
+            file_path = os.path.join(test_path, filename)
+            df = pd.read_csv(file_path)
+            
+            # Lấy dữ liệu từ 6 cột Gx, Gy, Gz, Ax, Ay, Az
+            features = df[['Gx', 'Gy', 'Gz', 'Ax', 'Ay', 'Az']].values
+            test_data.append(features)  # Thêm dữ liệu vào test_data
+            test_filenames.append(filename)  # Thêm tên tệp tin vào test_filenames
+            test_labels.append(0 if filename.endswith("_0.csv") else 1)  # Thêm nhãn vào test_labels (0: nữ, 1: nam)
+
+    test_data = np.array(test_data).reshape(len(test_data), -1)  # Chuyển đổi test_data thành mảng numpy 2D
+
+    predictions = svm_model.predict(test_data)  # Dự đoán giới tính trên dữ liệu kiểm tra
+
+    # In kết quả dự đoán và tên tệp tin tương ứng
+    for filename, label, prediction in zip(test_filenames, test_labels, predictions):
+        print("File:", filename)
+        print("Dự đoán giới tính:", prediction)
+        print("--------------------")
+
+    accuracy = accuracy_score(test_labels, predictions)  # Tính độ chính xác bằng cách so sánh nhãn thực tế và nhãn dự đoán
+    print("Độ chính xác của mô hình SVM trên dữ liệu kiểm tra: {:.2f}%".format(accuracy * 100))
+    temp = accuracy
+    results.append(temp*100)
+
+for i in range(0,91) :
+    for j in range(size):
+        data_processing_test(id[j],j,i+30)
+        data_processing_train(id[j],j,i+30)
+    train_test()
+
+
+df = pd.DataFrame({
+    'predictions': np.abs(results)
+})
+df.to_csv('../results/results_linear.csv', index=False)

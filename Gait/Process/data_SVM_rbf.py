@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-data = pd.read_csv(r'Data_set\results\IDGenderAgelist.csv', dtype = str)
+data = pd.read_csv(r'.\Data_set\results\IDGenderAgelist.csv', dtype = str)
 id = list(data.ID)
 gender = list(data.Gender)
 size = len(id)
@@ -30,7 +30,7 @@ def truncate_or_pad_data(data, length):
 def data_processing_train (id,i, max_data_length):
     id = id
     try:
-        dataset_file = f'./Data_set/Data/T0_ID{id}_Walk1.csv' #[] this_i = 0
+        dataset_file = f'../Data_set/Data/T0_ID{id}_Walk1.csv' #[] this_i = 0
         print(dataset_file)
         dataset_id = os.path.basename(dataset_file).split('_')[1]
         dataset = pd.read_csv(dataset_file, skiprows = 2, names=['Gx','Gy','Gz','Ax','Ay','Az'])
@@ -111,7 +111,7 @@ def data_processing_train (id,i, max_data_length):
     })
 
     # Đường dẫn thư mục tùy ý
-    folder_path = './Data_set/Data_train'
+    folder_path = '../Data_set/Data_train'
     if(gender[i]=='0'):
         output_file = os.path.join(folder_path, dataset_id + '_Walk1_0.csv')
     else:
@@ -125,7 +125,7 @@ def data_processing_train (id,i, max_data_length):
 def data_processing_test (id,i, max_data_length):
     id = id
     try:
-        dataset_file = f'./Data_set/Data2/T0_ID{id}_Walk2.csv' #[] this_i = 0
+        dataset_file = f'...Data_set/Data2/T0_ID{id}_Walk2.csv' #[] this_i = 0
         print(dataset_file)
         dataset_id = os.path.basename(dataset_file).split('_')[1]
         dataset = pd.read_csv(dataset_file, skiprows = 2, names=['Gx','Gy','Gz','Ax','Ay','Az'])
@@ -206,7 +206,7 @@ def data_processing_test (id,i, max_data_length):
     })
 
     # Đường dẫn thư mục tùy ý
-    folder_path = './Data_set/Data_test'
+    folder_path = '../Data_set/Data_test'
     if(gender[i]=='0'):
         output_file = os.path.join(folder_path, dataset_id + '_Walk2_0.csv')
     else:
@@ -219,7 +219,7 @@ def data_processing_test (id,i, max_data_length):
 
 def train_test():
     # Đường dẫn đến thư mục chứa dữ liệu
-    data_processing_dir = "./Data_set/Data_train/"
+    data_processing_dir = "../Data_set/Data_train/"
 
 
     # Xác định các đặc trưng (features) và nhãn (labels)
@@ -244,10 +244,10 @@ def train_test():
         train_data.append(flattened_data)
         train_labels.append(label)
     # Xây dựng mô hình SVM
-    svm_model = SVC(kernel='poly')
+    svm_model = SVC(kernel='rbf')
     svm_model.fit(train_data, train_labels)
 
-    test_path = "./Data_set/Data_test/"
+    test_path = "../Data_set/Data_test/"
 
 
     test_data = []
@@ -292,4 +292,4 @@ for i in range(0,91) :
 df = pd.DataFrame({
     'predictions': np.abs(results)
 })
-df.to_csv('./results_poly.csv', index=False)
+df.to_csv('../results/results_rbf.csv', index=False)

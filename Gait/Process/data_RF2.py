@@ -11,7 +11,7 @@ from sklearn.metrics import accuracy_score
 results = []
 
 # Đường dẫn đến thư mục chứa dữ liệu
-data_train_dir = "./Data_set/Data_train/"
+data_train_dir = "../Data_set/Data_train/"
 
 
 # Xác định các đặc trưng (features) và nhãn (labels)
@@ -41,7 +41,7 @@ for i in range(1,20) :
     rf_model = RandomForestClassifier(n_estimators=350)
     rf_model.fit(train_data, train_labels)
 
-    test_path = "./Data_set/Data_test/"
+    test_path = "../Data_set/Data_test/"
 
     test_data = []
     test_filenames = []
@@ -82,7 +82,7 @@ for i in range(1,20) :
 df = pd.DataFrame({
     'predictions': np.abs(results)
 })
-df.to_csv('./results_rf2.csv', index=False)
+df.to_csv('../results/results_rf2.csv', index=False)
 
 
     
