@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-data = pd.read_csv(r'.\Data_set\results\IDGenderAgelist.csv', dtype = str)
+data = pd.read_csv(r'..\Data_set\results\IDGenderAgelist.csv', dtype = str)
 id = list(data.ID)
 gender = list(data.Gender)
 size = len(id)
